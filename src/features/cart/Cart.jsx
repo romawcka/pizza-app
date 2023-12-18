@@ -1,4 +1,6 @@
-import { Link } from 'react-router-dom';
+import Button from '../../components/ui/Button';
+import ButtonLink from '../../components/ui/ButtonLink';
+import CartItem from './CartItem';
 
 const fakeCart = [
   {
@@ -25,18 +27,22 @@ const fakeCart = [
 ];
 
 function Cart() {
-  // eslint-disable-next-line no-unused-vars
   const cart = fakeCart;
 
   return (
-    <div>
-      <Link to="/menu">&larr; Back to menu</Link>
-
-      <h2>Your cart, %NAME%</h2>
-
-      <div>
-        <Link to="/order/new">Order pizzas</Link>
-        <button>Clear cart</button>
+    <div className="px-4 py-3">
+      <ButtonLink to={'/menu'}>Back to menu</ButtonLink>
+      <h2 className="mt-7 text-xl font-semibold">Your cart, %NAME%</h2>
+      <ul className="mt-3 divide-y divide-stone-200 border-b">
+        {cart.map((item) => (
+          <CartItem item={item} key={item.pizzaId} />
+        ))}
+      </ul>
+      <div className="mt-6 space-x-3">
+        <Button to={'/order/new'} type={'primary'}>
+          Order pizzas
+        </Button>
+        <Button type={'secondary'}>Clear cart</Button>
       </div>
     </div>
   );
