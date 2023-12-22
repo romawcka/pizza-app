@@ -1,9 +1,26 @@
-import { memo } from "react";
-import { formatCurrency } from "../../utils/helpers";
-import Button from "../../components/ui/Button";
+import { memo } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import Button from '../../components/ui/Button';
+import ButtonQtyUpdate from '../../components/ui/ButtonQtyUpdate';
+import DeleteButton from '../../components/ui/DeleteButton';
+import { formatCurrency } from '../../utils/helpers';
+import { addItem, getQntOfPizza } from '../cart/cartSlice';
 
 const MenuItem = ({ pizza }) => {
   const { id, name, unitPrice, ingredients, soldOut, imageUrl } = pizza;
+  const currentQntById = useSelector(getQntOfPizza(id));
+  const dispatch = useDispatch();
+
+  const handleAddItem = () => {
+    const newItem = {
+      pizzaId: id,
+      name,
+      quantity: 1,
+      unitPrice,
+      totalPrice: unitPrice * 1,
+    };
+    dispatch(addItem(newItem));
+  };
 
   return (
     <li className="flex gap-4 py-2">
@@ -25,7 +42,18 @@ const MenuItem = ({ pizza }) => {
               Sold out
             </p>
           )}
-          <Button type={'small'}>Add to cart</Button>
+
+          {!!currentQntById && (
+            <div className="flex flex-row items-center gap-3 sm:gap-8">
+              <ButtonQtyUpdate pizzaId={id}>{currentQntById}</ButtonQtyUpdate>
+              <DeleteButton pizzaId={id} currentQntById />
+            </div>
+          )}
+          {!soldOut && !currentQntById && (
+            <Button onClick={handleAddItem} type={'small'}>
+              Add to cart
+            </Button>
+          )}
         </div>
       </div>
     </li>
