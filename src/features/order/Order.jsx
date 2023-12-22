@@ -8,8 +8,13 @@ import {
   formatDate,
 } from '../../utils/helpers';
 import OrderItem from './OrderItem';
+import { useFetcher } from 'react-router-dom';
+import { useEffect } from 'react';
+import UpdatePriority from './UpdatePriority';
 
 const Order = () => {
+  const fetcher = useFetcher();
+
   const order = useLoaderData();
   const {
     id,
@@ -21,6 +26,12 @@ const Order = () => {
     cart,
   } = order;
   const deliveryIn = calcMinutesLeft(estimatedDelivery);
+
+  useEffect(() => {
+    if (!fetcher.data && fetcher.state === 'idle') fetcher.load('/menu');
+  }, [fetcher]);
+
+  const isLoadingIngredients = fetcher?.state === 'loading';
 
   return (
     <div className="space-y-8 px-4 py-6">
@@ -54,7 +65,15 @@ const Order = () => {
 
       <ul className="bordder-stone-200 divide-y divide-stone-200 border-b border-t">
         {cart.map((item) => (
-          <OrderItem item={item} key={item.id} />
+          <OrderItem
+            item={item}
+            key={item.id}
+            ingredients={
+              fetcher?.data?.find((el) => el.id === item.pizzaId).ingredients ??
+              []
+            }
+            isLoadingIngredients={isLoadingIngredients}
+          />
         ))}
       </ul>
 
@@ -71,6 +90,7 @@ const Order = () => {
           To pay on delivery: {formatCurrency(orderPrice + priorityPrice)}
         </p>
       </div>
+      {!priority && <UpdatePriority />}
     </div>
   );
 };
